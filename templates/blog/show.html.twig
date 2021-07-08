@@ -24,6 +24,7 @@
                 
                 {# la fonction path() attend en argument le NOM de la route définit dans le controlleur dans l'annotation @Route ("", name="NOM_ROUTE") ligne17#}
                 <a href="{{ path('blog')}}">Retour aux articles</a>
+                <a href="{{ path('blog_edit',{'id': articleBDD.id})}}">Modification</a>
                 </div>
             <div class="col-md-5 d-none d-lg-block">
           <img src="{{ articleBDD.image }}" alt="{{ articleBDD.titre }}" class="col-md-12">
