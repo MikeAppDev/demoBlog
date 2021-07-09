@@ -3,7 +3,9 @@
 namespace App\Controller;
 
 use App\Entity\Article;
+use App\Entity\Comment;
 use App\Form\ArticleType;
+use App\Form\CommentType;
 use App\Repository\ArticleRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Request;
@@ -166,7 +168,7 @@ class BlogController extends AbstractController
      */
     // public function show(ArticleRepository $repoArticle, $id) : Response
 
-    public function show(Article $article) : Response
+    public function show(Article $article, Request $request) : Response
     {   // l'ID transmit dans l'URL est envoyé directement en argument de la fonction show(), ce qui nous permet d'avoir acces à l'id de l'article a selectionner en BDD au sein de la methode.
         //dump($id);
 
@@ -181,8 +183,18 @@ class BlogController extends AbstractController
         //$article = $repoArticle->find($id);
         dump($article);
 
+        //TRAITEMENT COMMENTAIRE ARTICLE
+        $comment = new Comment;
+
+        $formComment = $this->createForm(CommentType::class, $comment);
+
+        $formComment->handleRequest($request);
+        
+        dump($request);
+
         return $this->render('blog/show.html.twig', [
-            'articleBDD' => $article // on transmet au template les données de l'article selectionné en BDD afin de les traiter avec le langage dans le template.
+            'articleBDD' => $article, // on transmet au template les données de l'article selectionné en BDD afin de les traiter avec le langage dans le template.
+            'formComment' => $formComment->createView()
         ]);
     }
 
