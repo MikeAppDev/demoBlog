@@ -2,7 +2,10 @@
 
 namespace App\DataFixtures;
 
+use DateTime;
 use App\Entity\Article;
+use App\Entity\Comment;
+use App\Entity\Category;
 use Doctrine\Persistence\ObjectManager;
 use Doctrine\Bundle\FixturesBundle\Fixture;
 
@@ -10,26 +13,58 @@ class ArticleFixtures extends Fixture
 {
     public function load(ObjectManager $manager)
     {
-        //la boucle for tourne 11 fois car nous voulons creer 11 articles.
-        for($i = 1; $i <= 11; $i++)
+        // On importe la librairie Faker pour les fixtures, cela nous permet de créer des fausses articles, catégories, commentaires plus évolués avec par exemple des faux noms, faux prénoms, date aléatoires etc...
+        $faker = \Faker\Factory::create('fr_FR');
+
+        //création de 3 catégories
+        for($cat = 1; $cat <= 3 ; $cat++)
         {
-            //Pour pouvoir insérer des données dans la table SQL article, nous devons instancier son entité corespondante (Article), Symfony se sert de l'objet entité $article pour injecter les valeurs dans les requetes SQL
-            $article = new Article;
+            $category = new Category;
 
+            $category->setTitre($faker->word)
+                    ->setDescription($faker->paragraph());
 
-            // On fait appel aux setteurs de l'objet entité afin de renseigner les titres, les contenu, les images et les dates des faux articles stockés en BDD
+            $manager->persist($category);
+            //creation de 4 à 10 articles par catégorie
+            for($art = 1; $art <= mt_rand(4,10); $art++)
+            {
+                $contenu = '<p>' . join($faker->paragraphs(5), '</p><p>') . '</p>';
 
-            $article->setTitre("Titre de l'article $i")
-                    ->setContenu("<p>Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.</p>")
-                    ->setImage("https://picsum.photos/600/600")
-                    ->setDate(new \DateTime());
-            //Un Manager (ObjectManager) en symfony est une classe permettant, entre autre, de manipuler les lignes de la BDD (INSERT, UPDATE, DELETE)
+                $article = new Article;
 
-            //persist() : methode issu de la classe Object Manager permettant de préparer et de farder en mémoire les requetes d'insertion en BDD
-            // $data = $bdd->prepare("INSERT INTO article VALUES ('getTitre()', 'getContenu()')")
-            $manager->persist($article);
+                $article->setTitre($faker->sentence())
+                        ->setContenu($contenu)
+                        ->setImage($faker->imageUrl(600,600))
+                        ->setDate($faker->dateTimeBetween('-6 months'))
+                        ->setCategory($category);
+
+                $manager->persist($article);
+
+                //creation de 4 à 10 commentaire pour chaque article
+                for($cmt = 1; $cmt <= mt_rand(4,10); $cmt++)
+                {
+                   
+
+                    $now = new DateTime;
+                    $interval = $now->diff($article->getDate());// retourne un timestamp (temps en secondes) entre la date de création des articles et aujourd'hui
+
+                    $days = $interval->days; // retourne le nombre de jour entre la date de création des articles et aujourd'hui
+
+                    $minimum = "-$days days"; // -100 days | le but est d'avoir des date de commentaires entre la date de création des articles et aujourd'hui.
+
+                    $contenu = '<p>' . join($faker->paragraphs(2), '</p><p>') . '</p>';
+
+                    $comment = new Comment;
+
+                    $comment->setAuteur($faker->name)
+                            ->setCommentaire($contenu)
+                            ->setDate($faker->dateTimeBetween($minimum)) // dateTimeBetween (-10 jours)
+                            ->setArticle($article);
+
+                    $manager->persist($comment);
+                }
+            }
         }
-        // flush() : méthode issue de la classe ObjectManager permettant véritablement d'executer les requetes d'insertions en BDD
 
         $manager->flush();
     }
