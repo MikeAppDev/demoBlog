@@ -168,7 +168,7 @@ class BlogController extends AbstractController
      */
     // public function show(ArticleRepository $repoArticle, $id) : Response
 
-    public function show(Article $article, Request $request) : Response
+    public function show(Article $article, Request $request, EntityManagerInterface $manager) : Response
     {   // l'ID transmit dans l'URL est envoyé directement en argument de la fonction show(), ce qui nous permet d'avoir acces à l'id de l'article a selectionner en BDD au sein de la methode.
         //dump($id);
 
@@ -190,7 +190,31 @@ class BlogController extends AbstractController
 
         $formComment->handleRequest($request);
         
-        dump($request);
+        dump($comment);
+
+        if($formComment->isSubmitted() && $formComment->isValid())
+        {
+            // On établit la realtion entre le commentaire et l'article (clé étrangère)
+            // setArticle() : méthode issue de l'entité Comment qui permet de rensigner l'article associé au commentaire
+            // Cette méthode attends en argument l'objet entité Article de la BDD et non la clé étrangère elle même
+
+            $comment->setDate(new \DateTime());
+            $comment->setArticle($article);
+            
+            $manager->persist($comment);
+            $manager->flush();
+
+            //addFlash est une method permettant de déclarer un message de validation stocké en session
+            //Arguments: 
+            //1. Identifiant du message(success)
+            //2. Le message utilisateur.
+            $this->addFlash('success',"Le com est bien enregistré c'est cool !");
+
+            // Après l'insertion, on redirige l'internaute vers l'affichage de l'article afin de rebooter le formulaire
+            return $this->redirectToRoute('blog_show', [
+                'id' => $article->getId()
+            ]);
+        }
 
         return $this->render('blog/show.html.twig', [
             'articleBDD' => $article, // on transmet au template les données de l'article selectionné en BDD afin de les traiter avec le langage dans le template.
