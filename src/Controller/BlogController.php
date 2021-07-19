@@ -144,6 +144,12 @@ class BlogController extends AbstractController
                     $article->setDate(new \DateTime());
                 }
 
+                $tags = $formArticle->get('tags')->getData();
+
+                // dd($tags); // pour envoyer mais supprimer directement
+
+                // $article->addTag($tag[0]);
+
                 $manager->persist($article);
                 $manager->flush();
 
@@ -161,7 +167,7 @@ class BlogController extends AbstractController
         }
 
 
-      /**
+    /**
      * Methode permettnt d'afficher le détail d'un article
      * 
      * @Route("/blog/{id}", name="blog_show")

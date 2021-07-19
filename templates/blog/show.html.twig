@@ -21,6 +21,12 @@
                 <div class="mb-1 text-muted">{{ articleBDD.date|date('d/m/Y à H:i:s')}}</div>
 
                 <p class="card-text">{{ articleBDD.contenu|raw }}</p>
+
+                {{ dump(articleBDD.tags)}}
+                {# nom du tag. #}
+                
+                {# notion de negationpour affichage si pas de Tag. #}
+                {# <h3>{{ articleBDD.tags.first.name }}</h3> #}
                 
                 {# la fonction path() attend en argument le NOM de la route définit dans le controlleur dans l'annotation @Route ("", name="NOM_ROUTE") ligne17#}
                 <a href="{{ path('blog')}}">Retour aux articles</a>
