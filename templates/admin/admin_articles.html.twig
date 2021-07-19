@@ -1,0 +1,67 @@
+{% extends "base_admin.html.twig" %}
+
+{% block title %}
+    Blog | Gestion des articles
+{% endblock %}
+
+{% block body %}
+
+    <h1 class="display-4 text-center my-4">Liste des Articles</h1>
+
+    {% for message in app.flashes('success') %}
+
+    <div class="col-md-4 bg-success text-center p-2 text-white mx-auto rouded my-2">
+    {{ message }}
+    </div>
+        
+    {% endfor %}
+
+    <table class="table table-bordered text-center">
+
+        <tr>
+        {# colonnes : variable provenant de AdminController qui contient toute les noms des champs / colonnes de la table SQL Article #}
+        {# oneColonne : variable de reception qui receptionne le nom d'une colonne par tour de boucle #}
+
+        {% for oneColonne in colonnes %}
+
+            <th>{{ oneColonne|upper }}</th>
+            {# upper: filtre twig permettant de mettre la chaine de caractères en majuscule #}
+            
+        {% endfor %}
+
+            <th>CATEG.</th>
+            <th>NB COMM.</th>
+            <th>MODIF</th>
+            <th>SUPP.</th>
+        </tr>
+
+        {% for oneArticle in articles %}
+
+            <tr>
+                <td>{{ oneArticle.id }}</td>
+                <td class="text-center"><a href="{{ path('blog_show', {'id' : oneArticle.id}) }}">{{ oneArticle.titre }}</a></td>
+                <td>{{ oneArticle.contenu|striptags|slice(0,300) }} [...]</td>
+                <td><img src="{{ oneArticle.image }}" alt="{{ oneArticle.titre }}" class="col-md-12 img-thumbnails"></td>
+                <td class="text-center">{{ oneArticle.date|date('d/mY à H:i:s') }}</td>
+                <td class="text-center"> {{ oneArticle.category.titre }}</td>
+                <td class="text-center">{{ oneArticle.comments|length }}</td>
+
+                <td>
+                    <a href="{{ path('blog_edit', {'id' : oneArticle.id}) }}" class="btn btn-primary">
+                        <i class="bi bi-pencil-square"></i>
+                    </a>
+                </td>
+                <td>
+                    <a href="{{ path('admin_article_remove', {'id' : oneArticle.id}) }}" class="btn btn-danger">
+                        <i class="bi bi-trash"></i>
+                    </a>
+                </td>
+            </tr>
+            
+        {% endfor %}
+    
+    </table>
+
+    
+
+{% endblock %}

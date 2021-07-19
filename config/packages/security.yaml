@@ -19,6 +19,13 @@ security:
         main:
             lazy: true
             provider: app_user_provider
+            # On indique à Symfony la classe permettant de s'authentifié (LoginFormAuthenticator), symfony va faire tout le travail pour nous et va contrôler au moment de la connexion, l'email et le mot de passe.
+            custom_authenticator: App\Security\LoginFormAuthenticator
+            # On indique à Symfony la route permettant de se déconnecter.
+            logout:
+                path: app_logout
+                # On définit la route de destination une fois déconnecté
+                target: blog
 
             # activate different ways to authenticate
             # https://symfony.com/doc/current/security.html#firewalls-authentication
@@ -26,8 +33,10 @@ security:
             # https://symfony.com/doc/current/security/impersonating_user.html
             # switch_user: true
 
-    # Easy way to control access for large sections of your site
-    # Note: Only the *first* access control that matches will be used
+    # On indique à symfony que seulement les utilisateurs ROLE_ADMIN en BDD auront accès au Backoffice donc à la route/admin
     access_control:
-        # - { path: ^/admin, roles: ROLE_ADMIN }
+        - { path: ^/admin, roles: ROLE_ADMIN }
         # - { path: ^/profile, roles: ROLE_USER }
+
+    #si un utilisateur non ROLE_ADMIN tente d'acceder au Backoffice, on le redirige vers le blog
+    access_denied_url: blog

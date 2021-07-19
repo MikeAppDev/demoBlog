@@ -35,6 +35,7 @@ class RegistrationController extends AbstractController
             $user->setPassword($hash);
         
             $entityManager = $this->getDoctrine()->getManager();
+            // $pdo->prepare("INSERT INTO user VALUES ('user->getPrenom()', '$user->getEmail()')")
             $entityManager->persist($user);
             $entityManager->flush();
             // do anything else you need here, like send an email
